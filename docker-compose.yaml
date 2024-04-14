@@ -1,0 +1,43 @@
+services:
+  botty:
+    build:
+      context: .
+      dockerfile: ./bot.Dockerfile
+    container_name: "bot"
+    environment:
+      - BOT_TOKEN
+      - MONGODB_ADDRESS="mongodb://mongodb:27017"
+      - OPENAI_API_KEY
+    depends_on:
+      - mongodb
+#    volumes:
+#      - host/bind/mount/path/logs.jl:docker/container/path/logs.jl
+    networks:
+      - bot-network
+
+  mongodb:
+    image: mongo:7-jammy
+    ports:
+      - '27017:27017'
+    volumes:
+      # set to local path for dataset storage
+      - $DATABASE_PATH:/data/db
+    command: mongod --quiet
+    networks:
+      - bot-network
+
+  embed_service:
+    build:
+      context: .
+      dockerfile: ./embed.Dockerfile
+    container_name: "embed_service"
+    ports:
+      - '8080:8080'
+    networks:
+      - bot-network
+
+
+networks:
+  bot-network:
+    name: bot-network
+    driver: bridge

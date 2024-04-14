@@ -1,0 +1,97 @@
+# See https://pre-commit.com for more information
+default_language_version:
+  python: python3.11
+repos:
+  # Make sure environment is up to date and not broken
+  # https://python-poetry.org/docs/master/pre-commit-hooks/
+  - repo: https://github.com/python-poetry/poetry
+    rev: 1.6.1
+    hooks:
+      - id: poetry-check
+        always_run: true
+      - id: poetry-lock
+        args: ["--no-update", "-vv"]
+      - id: poetry-export
+        name: poetry-export-bot
+        args: ["-f", "requirements.txt", "-o", "requirements-bot.txt", "--with", "bot"]
+      - id: poetry-export
+        name: poetry-export-embed-service
+        args: [ "-f", "requirements.txt", "-o", "requirements-embed-service.txt", "--with", "embed_service" ]
+  # General cleaning and checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-added-large-files # No accidental huge files
+        args: ["--maxkb=1000"]
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      # Syntactic checks for filetypes
+      # - id: check-yaml
+      # - id: check-json
+      # - id: check-toml
+  # Auto fix old Python conventions and code smells
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.38.0
+    hooks:
+      - id: pyupgrade
+        args: [--py38-plus, --keep-runtime-typing]
+  # Remove unused imports
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v1.6.1
+    hooks:
+      - id: autoflake
+        args:
+          - --in-place
+          - --remove-all-unused-imports
+          - --expand-star-imports
+          - --remove-unused-variables
+  # Sort imports
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+  # Format code in doc strings
+  - repo: https://github.com/asottile/blacken-docs
+    rev: 1.13.0
+    hooks:
+      - id: blacken-docs
+        additional_dependencies: [black==22.6.0]
+  # Format code
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+      - id: black
+        args: [--safe, --quiet]
+  # Linting, see .flake8 file for config
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        additional_dependencies: [
+            # https://github.com/PyCQA/flake8-bugbear
+            flake8-bugbear, # Catch common pitfalls with exceptions
+            # https://github.com/gforcada/flake8-builtins
+            flake8-builtins, # No shadowing of builtins
+            # https://github.com/adamchainz/flake8-comprehensions
+            flake8-comprehensions, # Catch common pitfalls with comprehensions
+            # https://gitlab.com/RoPP/flake8-use-pathlib
+            flake8-use-pathlib, # Replace 'os' methods with pathlib
+          ]
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        # we need this so the local config gets used and not the global config
+        entry: poetry run pylint
+        language: system
+        types: [python]
+        args: [
+            "-rn", # Only display messages
+            "-sn", # Don't display the score
+          ]
+  # Static type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.991
+    hooks:
+      - id: mypy
+        additional_dependencies: ['types-requests']
