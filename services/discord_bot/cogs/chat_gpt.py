@@ -14,8 +14,10 @@ class ChatGPT(GenericCog):
     @command(name="explain")
     async def explain(self, context: Context):
         if not discord.utils.get(self.bot.guild.roles, name="Admin") in context.author.roles:
+            self.bot.logger.info("Unauthorized call to !explain by %s", context.author.name)
             await context.message.reply("Sorry, You are not currently authorized to use this command.")
         elif context.message.reference is None:
+            self.bot.logger.info("Misuse of !explain command by %s: Not a reply.", context.author.name)
             await context.message.reply("This command only works in reply to another message.")
         else:
             reference_message = await context.channel.fetch_message(context.message.reference.message_id)
@@ -39,3 +41,4 @@ class ChatGPT(GenericCog):
                 f"{context.author.mention}, here is a summarized and simplified version of the message:\n"
                 f"{response.choices[0].message.content}"
             )
+            self.bot.logger.debug("Successful use of !explain on message %s", context.message.reference.message_id)

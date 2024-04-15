@@ -23,9 +23,10 @@ class Introduction(GenericCog):
         # Add person to database to track stats
         member_stats = {"name": member.name, "member_since": member.joined_at, "toxicity": 0, "identity_swap": 0}
         await self.bot.member_collection.insert_one(member_stats)
+        self.bot.logger.info("Added new member %s to database", member.name)
 
     @command(name="hello")
     async def hello_hello(self, context: Context):
         await context.channel.send(
-            "Hello! I am C-3PO, Human Cyborg Relations. I am fluent in over 6 million forms of communication."
+            "Hello! I am Botty, your friendly neighbourhood discord bot."
         )

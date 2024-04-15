@@ -21,6 +21,7 @@ class ContentSearch(GenericCog):
     async def add_content(self, context: Context, *args):
         if not discord.utils.get(self.bot.guild.roles, name="Admin") in context.author.roles:
             await context.message.reply("Sorry, You are not currently authorized to use this command.")
+            self.bot.logger.info("Unauthorized call to !add_content by %s", context.author.name)
         url = args[0]
         description = " ".join(args[1:])
         embedding = self.embed(description)
@@ -28,6 +29,7 @@ class ContentSearch(GenericCog):
         # Make more robust for when we add a source for the second time
         await self.bot.content_collection.insert_one(new_entry)
         await context.message.add_reaction("👍")
+        self.bot.logger.info("Content added for url %s", url)
 
     @command(name="search_content")
     async def search_content(self, context: Context, *, query):
@@ -43,8 +45,10 @@ class ContentSearch(GenericCog):
                 best_match = content_object
         if best_match:
             await context.message.reply(f"The best matching content I found is: {best_match['url']}")
+            self.bot.logger.debug("Content found for query %s", query)
         else:
             await context.message.reply("There was no match for this search query.")
+            self.bot.logger.debug("Content not found for query %s", query)
 
     def embed(self, text: str) -> np.ndarray:
         data = {"input_text": text}
