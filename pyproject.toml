@@ -30,14 +30,20 @@ onnxruntime = "^1.17.1"
 flask = "^3.0.2"
 transformers = "^4.39.3"
 flask-pydantic = "^0.12.0"
-torch = "^2.2.2"
 requests = "^2.31.0"
 sentencepiece = "^0.2.0"
+torch = {version = "^2.2.2+cpu", source = "pytorch_cpu"}
 
 
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.7.0"
+
+
+[[tool.poetry.source]]
+name = "pytorch_cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
