@@ -6,12 +6,10 @@ services:
     container_name: "bot"
     environment:
       - BOT_TOKEN
-      - MONGODB_ADDRESS="mongodb://mongodb:27017"
       - OPENAI_API_KEY
+      - LOGGER_LEVEL=INFO
     depends_on:
       - mongodb
-#    volumes:
-#      - host/bind/mount/path/logs.jl:docker/container/path/logs.jl
     networks:
       - bot-network
 

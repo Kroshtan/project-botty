@@ -43,21 +43,21 @@ class Identifier(GenericCog):
             await self.give_identity(payload)
 
     async def give_identity(self, payload):
-        if payload.member.name == "C-3PO":
+        if payload.member.name == "Botty":
             return
         message = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         await purge_reactions(message, payload.member, payload.emoji)
         if payload.emoji.name in self.role_dict:
-            if not self.bot.debug:
-                find_result = await self.bot.member_collection.find_one_and_update(
-                    {"name": payload.member.name}, {"$inc": {"identity_swap": 1}}, return_document=ReturnDocument.AFTER
+            find_result = await self.bot.member_collection.find_one_and_update(
+                {"name": payload.member.name}, {"$inc": {"identity_swap": 1}}, return_document=ReturnDocument.AFTER
+            )
+            if find_result["identity_swap"] >= 3:
+                await self.bot.alert_admins(payload.member, "Member is swapping identities too often")
+                await self.bot.member_collection.update_one(
+                    {"name": payload.member.name}, {"$set": {"identity_swap": 0}}
                 )
-                if find_result["identity_swap"] >= 3:
-                    await self.bot.alert_admins(payload.member, "Member is swapping identities too often")
-                    await self.bot.member_collection.update_one(
-                        {"name": payload.member.name}, {"$set": {"identity_swap": 0}}
-                    )
             assign_role = self.role_dict[payload.emoji.name]
+            self.bot.logger.info("Role %s given to %s", assign_role.name, payload.member.name)
             await payload.member.add_roles(assign_role)
             for role in self.role_dict.values():
                 if role != assign_role:

@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -13,7 +14,7 @@ from services.discord_bot.logging_formatter import LoggingFormatter
 
 def setup_logger():
     logger = logging.getLogger("discord_bot")
-    logger.setLevel(logging.INFO)
+    logger.setLevel(os.getenv("LOGGER_LEVEL", "INFO"))
 
     # Console handler
     console_handler = logging.StreamHandler()
@@ -46,13 +47,11 @@ class Botty(commands.Bot):
         self.toxicity_collection: motor.AsyncIOMotorCollection = Optional[None]
         self.content_collection: motor.AsyncIOMotorCollection = Optional[None]
         self.cogs_to_load = cogs
-        self.debug = False
 
     async def on_ready(self):
         # WARNING: This assumes bot is only assigned a single server
         self.guild = self.guilds[0]
-        if not self.debug:
-            await self.fill_db()
+        await self.fill_db()
         for cog in self.cogs.values():
             await cog.setup()
         with (Path(__file__).parent / "resources" / "portrait.jpg").open("rb") as image:
@@ -95,6 +94,5 @@ class Botty(commands.Bot):
         self.logger.info("Alerted admins. Reason: %s", reason)
 
     async def setup_hook(self) -> None:
-        if not self.debug:
-            await self.load_db()
+        await self.load_db()
         await self.load_cogs()
