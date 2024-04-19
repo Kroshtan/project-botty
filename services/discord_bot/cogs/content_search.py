@@ -34,6 +34,13 @@ class ContentSearch(GenericCog):
             await context.message.add_reaction("👍")
             self.bot.logger.info("Content added for url %s", url)
 
+    @command(name="list_content")
+    async def list_content(self, context: Context):
+        cursor = self.bot.content_collection.find({})
+        urls = [content_object["url"] for content_object in await cursor.to_list(None)]
+        output = "These are the urls currently stored as content:\n" + "\n".join(urls)
+        await context.message.reply(output)
+
     @command(name="search_content")
     async def search_content(self, context: Context, *, query):
         self.bot.logger.info(query)
