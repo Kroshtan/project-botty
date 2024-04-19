@@ -38,8 +38,17 @@ class ContentSearch(GenericCog):
     async def list_content(self, context: Context):
         cursor = self.bot.content_collection.find({})
         urls = [content_object["url"] for content_object in await cursor.to_list(None)]
-        output = "These are the urls currently stored as content:\n" + "\n".join(urls)
+        if urls:
+            output = "These are the urls currently stored as content:\n" + "\n".join(urls)
+        else:
+            output = "There are currently no urls stored as content"
         await context.message.reply(output)
+
+    @command(name="remove_content")
+    async def remove_content(self, context: Context, url):
+        await self.bot.content_collection.find_one_and_delete({"url": url})
+        await context.message.add_reaction("👍")
+        self.bot.logger.info("Content removed for url %s", url)
 
     @command(name="search_content")
     async def search_content(self, context: Context, *, query):
