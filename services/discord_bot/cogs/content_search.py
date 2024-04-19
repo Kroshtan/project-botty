@@ -8,13 +8,13 @@ from discord.ext.commands import Context, command
 
 from services.discord_bot.botty import Botty
 from services.discord_bot.cogs.generic_cog import GenericCog
-from services.discord_bot.utils import cosine_dist
+from services.discord_bot.utils import cosine_dist, normalize_url
 
 
 class ContentSearch(GenericCog):
     def __init__(self, bot: Botty, ip_address="http://embed_service", port="8080", endpoint="embed"):
         self.bot = bot
-        self.url = f"{ip_address}:{port}/{endpoint}"
+        self.embed_url = f"{ip_address}:{port}/{endpoint}"
         self.headers = {"content-type": "application/json"}
 
     @command(name="add_content")
@@ -22,11 +22,10 @@ class ContentSearch(GenericCog):
         if not discord.utils.get(self.bot.guild.roles, name="Admin") in context.author.roles:
             await context.message.reply("Sorry, You are not currently authorized to use this command.")
             self.bot.logger.info("Unauthorized call to !add_content by %s", context.author.name)
-        url = args[0]
+        url = normalize_url(args[0])
         description = " ".join(args[1:])
         embedding = self.embed(description)
         new_entry = {"url": url, "embedding": embedding.tolist(), "date_added": datetime.today()}
-        # Make more robust for when we add a source for the second time
         await self.bot.content_collection.insert_one(new_entry)
         await context.message.add_reaction("👍")
         self.bot.logger.info("Content added for url %s", url)
@@ -52,5 +51,5 @@ class ContentSearch(GenericCog):
 
     def embed(self, text: str) -> np.ndarray:
         data = {"input_text": text}
-        response = requests.post(self.url, data=json.dumps(data), headers=self.headers, timeout=60)
+        response = requests.post(self.embed_url, data=json.dumps(data), headers=self.headers, timeout=60)
         return np.array(response.json()["embeddings"])
