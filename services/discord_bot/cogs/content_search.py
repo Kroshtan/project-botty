@@ -23,12 +23,16 @@ class ContentSearch(GenericCog):
             await context.message.reply("Sorry, You are not currently authorized to use this command.")
             self.bot.logger.info("Unauthorized call to !add_content by %s", context.author.name)
         url = normalize_url(args[0])
-        description = " ".join(args[1:])
-        embedding = self.embed(description)
-        new_entry = {"url": url, "embedding": embedding.tolist(), "date_added": datetime.today()}
-        await self.bot.content_collection.insert_one(new_entry)
-        await context.message.add_reaction("👍")
-        self.bot.logger.info("Content added for url %s", url)
+        if await self.bot.content_collection.find_one({"url": url}):
+            await context.message.reply("This url is already stored, use update_content command instead.")
+            self.bot.logger.info("User %s attempted to add url %s, which is already present in database.", context.author.name, url)
+        else:
+            description = " ".join(args[1:])
+            embedding = self.embed(description)
+            new_entry = {"url": url, "embedding": embedding.tolist(), "date_added": datetime.today()}
+            await self.bot.content_collection.insert_one(new_entry)
+            await context.message.add_reaction("👍")
+            self.bot.logger.info("Content added for url %s", url)
 
     @command(name="search_content")
     async def search_content(self, context: Context, *, query):
