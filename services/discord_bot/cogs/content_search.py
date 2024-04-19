@@ -29,10 +29,26 @@ class ContentSearch(GenericCog):
         else:
             description = " ".join(args[1:])
             embedding = self.embed(description)
-            new_entry = {"url": url, "embedding": embedding.tolist(), "date_added": datetime.today()}
+            new_entry = {"url": url, "embedding": embedding.tolist(), "date_added": datetime.today(), "last_updated": datetime.today()}
             await self.bot.content_collection.insert_one(new_entry)
             await context.message.add_reaction("👍")
             self.bot.logger.info("Content added for url %s", url)
+
+    @command(name="update_content")
+    async def update_content(self, context: Context, *args):
+        if not discord.utils.get(self.bot.guild.roles, name="Admin") in context.author.roles:
+            await context.message.reply("Sorry, You are not currently authorized to use this command.")
+            self.bot.logger.info("Unauthorized call to !update_content by %s", context.author.name)
+        url = normalize_url(args[0])
+        if (await self.bot.content_collection.find_one({"url": url})) is None:
+            await context.message.reply("This url is not stored yet, use add_content command instead.")
+            self.bot.logger.info("User %s attempted to update url %s, which is not yet present in database.", context.author.name, url)
+        else:
+            description = " ".join(args[1:])
+            embedding = self.embed(description)
+            await self.bot.content_collection.find_one_and_update({"url": url}, {"$set": {"embedding": embedding.tolist(), "last_updated": datetime.today()}})
+            await context.message.add_reaction("👍")
+            self.bot.logger.info("Content updated for url %s", url)
 
     @command(name="list_content")
     async def list_content(self, context: Context):
