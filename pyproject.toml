@@ -23,6 +23,7 @@ motor = "^3.4.0"
 openai = "^1.14.3"
 numpy = "^1.26.4"
 requests = "^2.31.0"
+gcld3 = "^3.0.13"
 
 
 [tool.poetry.group.embed_service.dependencies]

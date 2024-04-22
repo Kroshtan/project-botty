@@ -8,7 +8,7 @@ from discord.ext.commands import Context, command
 
 from services.discord_bot.botty import Botty
 from services.discord_bot.cogs.generic_cog import GenericCog
-from services.discord_bot.utils import cosine_dist, normalize_url
+from services.discord_bot.utils import cosine_dist, language_detection, normalize_url
 
 
 class ContentSearch(GenericCog):
@@ -25,11 +25,23 @@ class ContentSearch(GenericCog):
         url = normalize_url(args[0])
         if await self.bot.content_collection.find_one({"url": url}):
             await context.message.reply("This url is already stored, use update_content command instead.")
-            self.bot.logger.info("User %s attempted to add url %s, which is already present in database.", context.author.name, url)
+            self.bot.logger.info(
+                "User %s attempted to add url %s, which is already present in database.", context.author.name, url
+            )
         else:
             description = " ".join(args[1:])
+            language = language_detection(description)
+            if language != "en":
+                await context.message.reply("Sorry, only english descriptions are supported for this feature.")
+                return
             embedding = self.embed(description)
-            new_entry = {"url": url, "embedding": embedding.tolist(), "date_added": datetime.today(), "last_updated": datetime.today()}
+            new_entry = {
+                "url": url,
+                "embedding": embedding.tolist(),
+                "date_added": datetime.today(),
+                "last_updated": datetime.today(),
+                "language": language,
+            }
             await self.bot.content_collection.insert_one(new_entry)
             await context.message.add_reaction("👍")
             self.bot.logger.info("Content added for url %s", url)
@@ -42,11 +54,15 @@ class ContentSearch(GenericCog):
         url = normalize_url(args[0])
         if (await self.bot.content_collection.find_one({"url": url})) is None:
             await context.message.reply("This url is not stored yet, use add_content command instead.")
-            self.bot.logger.info("User %s attempted to update url %s, which is not yet present in database.", context.author.name, url)
+            self.bot.logger.info(
+                "User %s attempted to update url %s, which is not yet present in database.", context.author.name, url
+            )
         else:
             description = " ".join(args[1:])
             embedding = self.embed(description)
-            await self.bot.content_collection.find_one_and_update({"url": url}, {"$set": {"embedding": embedding.tolist(), "last_updated": datetime.today()}})
+            await self.bot.content_collection.find_one_and_update(
+                {"url": url}, {"$set": {"embedding": embedding.tolist(), "last_updated": datetime.today()}}
+            )
             await context.message.add_reaction("👍")
             self.bot.logger.info("Content updated for url %s", url)
 
@@ -69,6 +85,10 @@ class ContentSearch(GenericCog):
     @command(name="search_content")
     async def search_content(self, context: Context, *, query):
         self.bot.logger.info(query)
+        language = language_detection(query)
+        if language != "en":
+            await context.message.reply("Sorry, only english queries are supported for this feature.")
+            return
         query_embedding = self.embed(query)
         lowest_dist = float("inf")
         best_match = None

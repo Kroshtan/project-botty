@@ -274,6 +274,14 @@ frozenlist==1.4.1 ; python_version >= "3.11" and python_version < "3.12" \
     --hash=sha256:fbeb989b5cc29e8daf7f976b421c220f1b8c731cbf22b9130d8815418ea45887 \
     --hash=sha256:fde5bd59ab5357e3853313127f4d3565fc7dad314a74d7b5d43c22c6a5ed2ced \
     --hash=sha256:fe1a06da377e3a1062ae5fe0926e12b84eceb8a50b350ddca72dc85015873f74
+gcld3==3.0.13 ; python_version >= "3.11" and python_version < "3.12" \
+    --hash=sha256:11a127e493c2952a83a957e2f025d6ff8b1d2efd353baa25bd99d7ceb3c96c54 \
+    --hash=sha256:47c8c779bfe7372a38564b0cd357556dc362aec81cb55b0c889059e8b952e959 \
+    --hash=sha256:4fc4ae1c8c7baab21a46fc66074787d010ca338f5c4b2ff80dd2448d18cc3d89 \
+    --hash=sha256:51538b26dd1741f49ceb03421710d4355c6ce3fd257a2ddebe868e36458f5d45 \
+    --hash=sha256:b56a9852861c7209434917885b8331ddf5f11d3d5810baafb9a29ffd5ccd35d1 \
+    --hash=sha256:c6bc0ecf3d95943a2b9fe61214aab8284a3b33f25e07c6caad064ea59417620f \
+    --hash=sha256:fb745958278bfcc230fe3e15af3babb2752e77afd929ae0f95b9ef52648f3271
 h11==0.14.0 ; python_version >= "3.11" and python_version < "3.12" \
     --hash=sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d \
     --hash=sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761
