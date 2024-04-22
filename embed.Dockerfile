@@ -7,6 +7,7 @@ WORKDIR /app
 COPY requirements-embed-service.txt .
 
 RUN python -m pip install --no-cache-dir -r requirements-embed-service.txt
+RUN python -m pip install torch==2.2.2+cpu -f https://download.pytorch.org/whl/torch_stable.html
 
 COPY services/embed_service services/embed_service
 COPY pyproject.toml .
