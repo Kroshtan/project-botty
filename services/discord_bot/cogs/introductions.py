@@ -27,6 +27,4 @@ class Introduction(GenericCog):
 
     @command(name="hello")
     async def hello_hello(self, context: Context):
-        await context.channel.send(
-            "Hello! I am Botty, your friendly neighbourhood discord bot."
-        )
+        await context.channel.send("Hello! I am Botty, your friendly neighbourhood discord bot.")
