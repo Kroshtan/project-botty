@@ -30,6 +30,14 @@ class _Config(BaseSettings):
         }
 
     @property
+    def chatgpt_roles(self):
+        return {"Admin"}
+
+    @property
+    def content_search_admin_roles(self):
+        return {"Admin"}
+
+    @property
     def introduction_channels(self):
         # This handles, for example, 2 intro channels, for English and Dutch
         return [
