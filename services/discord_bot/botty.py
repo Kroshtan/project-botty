@@ -8,7 +8,7 @@ import motor.motor_asyncio as motor
 from discord import Guild
 from discord.ext import commands
 
-from services.discord_bot.constants import CHANNEL_DICT
+from services.discord_bot.config import CONFIG
 from services.discord_bot.logging_formatter import LoggingFormatter
 
 
@@ -89,7 +89,7 @@ class Botty(commands.Bot):
                 self.logger.debug("%s already in DB", member.name)
 
     async def alert_admins(self, member: discord.Member, reason: str):
-        admin_channel = self.get_channel(CHANNEL_DICT["admin"])
+        admin_channel = self.get_channel(CONFIG.admin_channel_id)
         await admin_channel.send(f"{member.mention} is being flagged.\nReason: {reason}")
         self.logger.info("Alerted admins. Reason: %s", reason)
 
