@@ -8,13 +8,14 @@ from discord.ext.commands import Context, command
 
 from services.discord_bot.botty import Botty
 from services.discord_bot.cogs.generic_cog import GenericCog
+from services.discord_bot.config import CONFIG
 from services.discord_bot.utils import cosine_dist, language_detection, normalize_url
 
 
 class ContentSearch(GenericCog):
-    def __init__(self, bot: Botty, ip_address="http://embed_service", port="8080", endpoint="embed"):
+    def __init__(self, bot: Botty):
         self.bot = bot
-        self.embed_url = f"{ip_address}:{port}/{endpoint}"
+        self.embed_url = CONFIG.embed_service_url
         self.headers = {"content-type": "application/json"}
 
     @command(name="add_content")

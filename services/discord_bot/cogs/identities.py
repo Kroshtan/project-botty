@@ -6,7 +6,7 @@ from pymongo import ReturnDocument
 
 from services.discord_bot.botty import Botty
 from services.discord_bot.cogs.generic_cog import GenericCog
-from services.discord_bot.constants import CHANNEL_DICT, MESSAGE_DICT
+from services.discord_bot.config import CONFIG
 from services.discord_bot.utils import purge_reactions
 
 
@@ -20,26 +20,22 @@ class Identifier(GenericCog):
         self.fill_role_dict()
 
     async def init_welcome_messages(self):
-        for lang in ["en", "nl"]:
-            message = await self.bot.get_channel(CHANNEL_DICT[f"introduction_{lang}"]).fetch_message(
-                MESSAGE_DICT[f"welcome_{lang}"]
+        for introduction_channel in CONFIG.introduction_channels:
+            message = await self.bot.get_channel(introduction_channel["channel_id"]).fetch_message(
+                introduction_channel["message_id"]
             )
-            for emoji in ["⭐", "🌞", "❤️", "💚", "📖", "💗"]:
+            for emoji in CONFIG.self_assignable_roles:
                 await message.add_reaction(emoji)
 
     def fill_role_dict(self):
         self.role_dict = {
-            "⭐": discord.utils.get(self.bot.guild.roles, name="VIP"),
-            "🌞": discord.utils.get(self.bot.guild.roles, name="Caregiver"),
-            "❤️": discord.utils.get(self.bot.guild.roles, name="Partner"),
-            "💚": discord.utils.get(self.bot.guild.roles, name="Family Member"),
-            "📖": discord.utils.get(self.bot.guild.roles, name="Professional"),
-            "💗": discord.utils.get(self.bot.guild.roles, name="Biological Mother"),
+            key: discord.utils.get(self.bot.guild.roles, name=value)
+            for key, value in CONFIG.self_assignable_roles.items()
         }
 
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        if payload.message_id in [MESSAGE_DICT["welcome_nl"], MESSAGE_DICT["welcome_en"]]:
+        if payload.message_id in [intro_channel["message_id"] for intro_channel in CONFIG.introduction_channels]:
             await self.give_identity(payload)
 
     async def give_identity(self, payload):
