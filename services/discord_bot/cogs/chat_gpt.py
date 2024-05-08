@@ -1,9 +1,9 @@
-import discord
 import openai
 from discord.ext.commands import Context, command
 
 from services.discord_bot.botty import Botty
 from services.discord_bot.cogs.generic_cog import GenericCog
+from services.discord_bot.config import CONFIG
 
 
 class ChatGPT(GenericCog):
@@ -13,7 +13,7 @@ class ChatGPT(GenericCog):
 
     @command(name="explain")
     async def explain(self, context: Context):
-        if not discord.utils.get(self.bot.guild.roles, name="Admin") in context.author.roles:
+        if not CONFIG.chat_gpt_roles & {role.name for role in context.author.roles}:
             self.bot.logger.info("Unauthorized call to !explain by %s", context.author.name)
             await context.message.reply("Sorry, You are not currently authorized to use this command.")
         elif context.message.reference is None:

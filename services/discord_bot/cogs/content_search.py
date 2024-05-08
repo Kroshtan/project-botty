@@ -1,7 +1,6 @@
 import json
 from datetime import datetime
 
-import discord
 import numpy as np
 import requests
 from discord.ext.commands import Context, command
@@ -20,7 +19,7 @@ class ContentSearch(GenericCog):
 
     @command(name="add_content")
     async def add_content(self, context: Context, *args):
-        if not discord.utils.get(self.bot.guild.roles, name="Admin") in context.author.roles:
+        if not CONFIG.content_search_admin_roles & {role.name for role in context.author.roles}:
             await context.message.reply("Sorry, You are not currently authorized to use this command.")
             self.bot.logger.info("Unauthorized call to !add_content by %s", context.author.name)
         url = normalize_url(args[0])
@@ -49,7 +48,7 @@ class ContentSearch(GenericCog):
 
     @command(name="update_content")
     async def update_content(self, context: Context, *args):
-        if not discord.utils.get(self.bot.guild.roles, name="Admin") in context.author.roles:
+        if not CONFIG.content_search_admin_roles & {role.name for role in context.author.roles}:
             await context.message.reply("Sorry, You are not currently authorized to use this command.")
             self.bot.logger.info("Unauthorized call to !update_content by %s", context.author.name)
         url = normalize_url(args[0])
@@ -69,6 +68,9 @@ class ContentSearch(GenericCog):
 
     @command(name="list_content")
     async def list_content(self, context: Context):
+        if not CONFIG.content_search_admin_roles & {role.name for role in context.author.roles}:
+            await context.message.reply("Sorry, You are not currently authorized to use this command.")
+            self.bot.logger.info("Unauthorized call to !list_content by %s", context.author.name)
         cursor = self.bot.content_collection.find({})
         urls = [content_object["url"] for content_object in await cursor.to_list(None)]
         if urls:
@@ -79,6 +81,9 @@ class ContentSearch(GenericCog):
 
     @command(name="remove_content")
     async def remove_content(self, context: Context, url):
+        if not CONFIG.content_search_admin_roles & {role.name for role in context.author.roles}:
+            await context.message.reply("Sorry, You are not currently authorized to use this command.")
+            self.bot.logger.info("Unauthorized call to !remove_content by %s", context.author.name)
         await self.bot.content_collection.find_one_and_delete({"url": url})
         await context.message.add_reaction("👍")
         self.bot.logger.info("Content removed for url %s", url)
