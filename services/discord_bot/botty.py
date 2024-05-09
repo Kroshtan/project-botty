@@ -5,6 +5,7 @@ from typing import Optional
 
 import discord
 import motor.motor_asyncio as motor
+import openai
 from discord import Guild
 from discord.ext import commands
 
@@ -46,6 +47,9 @@ class Botty(commands.Bot):
         self.member_collection: motor.AsyncIOMotorCollection = Optional[None]
         self.toxicity_collection: motor.AsyncIOMotorCollection = Optional[None]
         self.content_collection: motor.AsyncIOMotorCollection = Optional[None]
+
+        self.openai_client = openai.OpenAI()
+
         self.cogs_to_load = cogs
 
     async def on_ready(self):

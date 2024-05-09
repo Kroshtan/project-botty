@@ -14,15 +14,18 @@ class Identifier(GenericCog):
     def __init__(self, bot: Botty):
         self.bot = bot
         self.role_dict: Dict = {}
+        if not hasattr(self.bot, "member_collection"):
+            self.bot.logger.error("Attempting to use Identities Cog without MongoDB member_collection")
+            raise AttributeError("Attempting to use Identities Cog without MongoDB member_collection")
 
     async def setup(self):
         await self.init_welcome_messages()
         self.fill_role_dict()
 
     async def init_welcome_messages(self):
-        for introduction_channel in CONFIG.introduction_channels:
-            message = await self.bot.get_channel(introduction_channel["channel_id"]).fetch_message(
-                introduction_channel["message_id"]
+        for welcome_channel in CONFIG.welcome_channels:
+            message = await self.bot.get_channel(welcome_channel["channel_id"]).fetch_message(
+                welcome_channel["message_id"]
             )
             for emoji in CONFIG.self_assignable_roles:
                 await message.add_reaction(emoji)
@@ -35,7 +38,7 @@ class Identifier(GenericCog):
 
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        if payload.message_id in [intro_channel["message_id"] for intro_channel in CONFIG.introduction_channels]:
+        if payload.message_id in [welcome_channel["message_id"] for welcome_channel in CONFIG.welcome_channels]:
             await self.give_identity(payload)
 
     async def give_identity(self, payload):

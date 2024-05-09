@@ -8,6 +8,9 @@ from services.discord_bot.cogs.generic_cog import GenericCog
 class Toxicity(GenericCog):
     def __init__(self, bot: Botty):
         self.bot = bot
+        if not hasattr(self.bot, "member_collection"):
+            self.bot.logger.error("Attempting to use Toxicity Cog without MongoDB member_collection")
+            raise AttributeError("Attempting to use Toxicity Cog without MongoDB member_collection")
 
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):

@@ -16,6 +16,9 @@ class ContentSearch(GenericCog):
         self.bot = bot
         self.embed_url = CONFIG.embed_service_url
         self.headers = {"content-type": "application/json"}
+        if not hasattr(self.bot, "content_collection"):
+            self.bot.logger.error("Attempting to use ContentSearch Cog without MongoDB content_collection")
+            raise AttributeError("Attempting to use ContentSearch Cog without MongoDB content_collection")
 
     @command(name="add_content")
     async def add_content(self, context: Context, *args):
