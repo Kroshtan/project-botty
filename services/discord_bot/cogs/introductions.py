@@ -3,19 +3,22 @@ from discord.ext.commands import Cog, Context, command
 
 from services.discord_bot.botty import Botty
 from services.discord_bot.cogs.generic_cog import GenericCog
-from services.discord_bot.constants import CHANNEL_DICT
+from services.discord_bot.config import CONFIG
 
 
 class Introduction(GenericCog):
     def __init__(self, bot: Botty):
         self.bot = bot
+        if not hasattr(self.bot, "member_collection"):
+            self.bot.logger.error("Attempting to use Introductions Cog without MongoDB member_collection")
+            raise AttributeError("Attempting to use Introductions Cog without MongoDB member_collection")
 
     async def setup(self):
         pass
 
     @Cog.listener()
     async def on_message(self, message: discord.Message):
-        if message.channel.id in [CHANNEL_DICT["introduction_nl"], CHANNEL_DICT["introduction_en"]]:
+        if message.channel.id in CONFIG.introduction_channels:
             await message.add_reaction("😃")
 
     @Cog.listener()

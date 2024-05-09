@@ -1,4 +1,3 @@
-import openai
 from discord.ext.commands import Context, command
 
 from services.discord_bot.botty import Botty
@@ -9,7 +8,9 @@ from services.discord_bot.config import CONFIG
 class ChatGPT(GenericCog):
     def __init__(self, bot: Botty):
         self.bot = bot
-        self.openai_client = openai.OpenAI()
+        if not hasattr(self.bot, "openai_client"):
+            self.bot.logger.error("Attempting to use ChatGPT Cog without openai_client")
+            raise AttributeError("Attempting to use ChatGPT Cog without openai_client")
 
     @command(name="explain")
     async def explain(self, context: Context):
@@ -21,7 +22,7 @@ class ChatGPT(GenericCog):
             await context.message.reply("This command only works in reply to another message.")
         else:
             reference_message = await context.channel.fetch_message(context.message.reference.message_id)
-            response = self.openai_client.chat.completions.create(
+            response = self.bot.openai_client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {

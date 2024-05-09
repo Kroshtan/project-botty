@@ -39,6 +39,13 @@ class _Config(BaseSettings):
 
     @property
     def introduction_channels(self):
+        return [
+            1215812458531262544,
+            1222655667488296960,
+        ]
+
+    @property
+    def welcome_channels(self):
         # This handles, for example, 2 intro channels, for English and Dutch
         return [
             {"channel_id": 1222655567705669693, "message_id": 1224098100021432410},
