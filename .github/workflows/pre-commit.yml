@@ -18,7 +18,7 @@ jobs:
       with:
         version: 1.6.1
     - name: Install protobuf compiler
-      run: apt-get update && apt install -y protobuf-compiler build-essential
+      run: sudo apt-get update && sudo apt install -y protobuf-compiler build-essential
     - name: Install project
       run: poetry install --no-interaction
     - uses: pre-commit/action@v3.0.1
