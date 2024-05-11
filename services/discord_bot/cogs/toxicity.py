@@ -21,7 +21,7 @@ class Toxicity(GenericCog):
                 {"name": message.author.name}, {"$inc": {"toxicity": 1}}, return_document=ReturnDocument.AFTER
             )
             if find_result["toxicity"] >= 3:
-                await self.bot.alert_admins(payload.member, "Member is perceived as toxic by other users")
+                await self.bot.alert_admins(message.author, "Member is perceived as toxic by other users")
             # TODO: Store toxic messages, retrieve them when a user is reported and admins can see the grievances
 
     @Cog.listener()

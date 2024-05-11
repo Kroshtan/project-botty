@@ -14,7 +14,7 @@ class ChatGPT(GenericCog):
 
     @command(name="explain")
     async def explain(self, context: Context):
-        if not CONFIG.chat_gpt_roles & {role.name for role in context.author.roles}:
+        if not CONFIG.chatgpt_roles & {role.name for role in context.author.roles}:
             self.bot.logger.info("Unauthorized call to !explain by %s", context.author.name)
             await context.message.reply("Sorry, You are not currently authorized to use this command.")
         elif context.message.reference is None:
